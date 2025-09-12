@@ -2,3 +2,13 @@ p {
     color: #00008B;
     font-size: 32px;
 }
+
+.my-button {
+            background-color: #4CAF50; /* Зеленый фон */
+            color: white; /* Белый текст */
+            padding: 15px 32px; /* Отступы */
+            font-size: 16px; /* Размер шрифта */
+            cursor: pointer; /* Курсор-указатель */
+            border: none; /* Убираем границу */
+            border-radius: 8px; /* Закругленные углы */
+        }
