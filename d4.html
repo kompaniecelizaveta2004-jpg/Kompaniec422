@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кафе "Уютное местечко"</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="header">
+        <h1>Кафе "Уютное местечко"</h1>
+        <p>Добро пожаловать! Выберите понравившиеся блюда</p>
+    </div>
+    
+    <input type="text" class="search-box" placeholder="Поиск блюда...">
+    
+    <div class="menu">
+        <div class="menu-item">
+            <input type="checkbox" id="dish1" class="dish-checkbox">
+            <label for="dish1"><strong>Борщ</strong> - 350 руб.</label>
+            <p>Традиционный украинский суп со свеклой и мясом</p>
+        </div>
+        
+        <div class="menu-item">
+            <input type="checkbox" id="dish2" class="dish-checkbox">
+            <label for="dish2"><strong>Цезарь с курицей</strong> - 420 руб.</label>
+            <p>Салат с листьями айсберг, куриной грудкой и соусом цезарь</p>
+        </div>
+        
+        <div class="menu-item">
+            <input type="checkbox" id="dish3" class="dish-checkbox">
+            <label for="dish3"><strong>Карбонара</strong> - 380 руб.</label>
+            <p>Паста с беконом, сыром пармезан и соусом на основе сливок</p>
+        </div>
+        
+        <div class="menu-item">
+            <input type="checkbox" id="dish4" class="dish-checkbox">
+            <label for="dish4"><strong>Стейк из лосося</strong> - 550 руб.</label>
+            <p>Лосось на гриле с овощами и лимоном</p>
+        </div>
+        
+        <div class="menu-item">
+            <input type="checkbox" id="dish5" class="dish-checkbox">
+            <label for="dish5"><strong>Пицца Маргарита</strong> - 450 руб.</label>
+            <p>Классическая итальянская пицца с томатами и моцареллой</p>
+        </div>
+        
+        <div class="menu-item">
+            <input type="checkbox" id="dish6" class="dish-checkbox">
+            <label for="dish6"><strong>Блины с творогом</strong> - 280 руб.</label>
+            <p>Тонкие блины с творожной начинкой и сметаной</p>
+        </div>
+        
+        <div class="menu-item">
+            <input type="checkbox" id="dish7" class="dish-checkbox">
+            <label for="dish7"><strong>Шоколадный торт</strong> - 220 руб.</label>
+            <p>Нежный шоколадный торт с вишневой прослойкой</p>
+        </div>
+    </div>
+    
+    <button class="order-btn" onclick="placeOrder()">Заказать</button>
+    
+    <div class="notification" id="notification"></div>
+
+    <script>
+        function placeOrder() {
+            const selectedDishes = [];
+            const checkboxes = document.querySelectorAll('.dish-checkbox:checked');
+            
+            if (checkboxes.length === 0) {
+                alert('Пожалуйста, выберите хотя бы одно блюдо!');
+                return;
+            }
+            
+            checkboxes.forEach(checkbox => {
+                const dishName = checkbox.nextElementSibling.textContent.split(' - ')[0];
+                selectedDishes.push(dishName);
+            });
+            
+            const orderText = selectedDishes.join(', ');
+            const notification = document.getElementById('notification');
+            
+            notification.textContent = `Вы заказали: ${orderText}. Ожидайте!`;
+            notification.style.display = 'block';
+            
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 5000);
+            
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = false;
+            });
+        }
+    </script>
+</body>
+</html>
