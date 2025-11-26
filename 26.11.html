@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>React Auth App</title>
+    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        .App { min-height: 100vh; background-color: #f5f5f5; }
+        .app-header { background: #2c3e50; color: white; padding: 1rem; display: flex; justify-content: space-between; }
+        .auth-form { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); max-width: 400px; margin: 2rem auto; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: bold; }
+        .form-group input { width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; }
+        .btn-primary { background: #3498db; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 4px; cursor: pointer; width: 100%; }
+        .btn-link { background: none; border: none; color: #3498db; cursor: pointer; text-decoration: underline; }
+        .error { color: #e74c3c; font-size: 0.875rem; }
+        .users-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem; margin-top: 1rem; }
+        .user-card { background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        function Login({ onSwitchToRegister, onLogin }) {
+            const [formData, setFormData] = useState({ login: '', password: '' });
+
+            const handleChange = (e) => {
+                setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+            };
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                onLogin(formData);
+            };
+
+            return (
+                <div className="auth-form">
+                    <h2>Вход</h2>
+                    <form onSubmit={handleSubmit}>
+                        <div className="form-group">
+                            <label>Логин:</label>
+                            <input type="text" name="login" value={formData.login} onChange={handleChange} required />
+                        </div>
+                        <div className="form-group">
+                            <label>Пароль:</label>
+                            <input type="password" name="password" value={formData.password} onChange={handleChange} required />
+                        </div>
+                        <button type="submit" className="btn-primary">Войти</button>
+                    </form>
+                    <p>Нет аккаунта? <button className="btn-link" onClick={onSwitchToRegister}>Зарегистрироваться</button></p>
+                </div>
+            );
+        }
+
+        function Register({ onSwitchToLogin, onRegister }) {
+            const [formData, setFormData] = useState({ login: '', password: '', confirmPassword: '' });
+            const [errors, setErrors] = useState({});
+
+            const handleChange = (e) => {
+                setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+                if (errors[e.target.name]) setErrors(prev => ({ ...prev, [e.target.name]: '' }));
+            };
+
+            const validateForm = () => {
+                const newErrors = {};
+                if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = 'Пароли не совпадают';
+                if (formData.password.length < 6) newErrors.password = 'Пароль должен быть не менее 6 символов';
+                setErrors(newErrors);
+                return Object.keys(newErrors).length === 0;
+            };
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                if (validateForm()) onRegister({ login: formData.login, password: formData.password });
+            };
+
+            return (
+                <div className="auth-form">
+                    <h2>Регистрация</h2>
+                    <form onSubmit={handleSubmit}>
+                        <div className="form-group">
+                            <label>Логин:</label>
+                            <input type="text" name="login" value={formData.login} onChange={handleChange} required />
+                        </div>
+                        <div className="form-group">
+                            <label>Пароль:</label>
+                            <input type="password" name="password" value={formData.password} onChange={handleChange} required />
+                            {errors.password && <span className="error">{errors.password}</span>}
+                        </div>
+                        <div className="form-group">
+                            <label>Повторите пароль:</label>
+                            <input type="password" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} required />
+                            {errors.confirmPassword && <span className="error">{errors.confirmPassword}</span>}
+                        </div>
+                        <button type="submit" className="btn-primary">Зарегистрироваться</button>
+                    </form>
+                    <p>Уже есть аккаунт? <button className="btn-link" onClick={onSwitchToLogin}>Войти</button></p>
+                </div>
+            );
+        }
+
+        function UserList() {
+            const [users] = useState([
+                { id: 1, name: 'Иван Иванов', email: 'ivan@example.com' },
+                { id: 2, name: 'Петр Петров', email: 'petr@example.com' },
+                { id: 3, name: 'Мария Сидорова', email: 'maria@example.com' }
+            ]);
+
+            return (
+                <div className="user-list">
+                    <h2>Список пользователей</h2>
+                    <div className="users-grid">
+                        {users.map(user => (
+                            <div key={user.id} className="user-card">
+                                <h3>{user.name}</h3>
+                                <p>{user.email}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        }
+
+        function App() {
+            const [isLogin, setIsLogin] = useState(true);
+            const [isAuthenticated, setIsAuthenticated] = useState(false);
+            const [currentUser, setCurrentUser] = useState('');
+
+            const handleAuthSuccess = (username) => {
+                setIsAuthenticated(true);
+                setCurrentUser(username);
+            };
+
+            const handleLogout = () => {
+                setIsAuthenticated(false);
+                setCurrentUser('');
+            };
+
+            if (isAuthenticated) {
+                return (
+                    <div className="App">
+                        <header className="app-header">
+                            
+                            <div className="user-info">
+                                <span>Добро пожаловать, {currentUser}!</span>
+                                <button onClick={handleLogout} className="btn-primary">Выйти</button>
+                            </div>
+                        </header>
+                        <main className="main-content">
+                            <UserList />
+                        </main>
+                    </div>
+                );
+            }
+
+            return (
+                <div className="App">
+                    <header className="app-header">
+                        
+                    </header>
+                    <main className="main-content">
+                        {isLogin ? (
+                            <Login 
+                                onSwitchToRegister={() => setIsLogin(false)}
+                                onLogin={handleAuthSuccess}
+                            />
+                        ) : (
+                            <Register 
+                                onSwitchToLogin={() => setIsLogin(true)}
+                                onRegister={handleAuthSuccess}
+                            />
+                        )}
+                    </main>
+                </div>
+            );
+        }
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>
